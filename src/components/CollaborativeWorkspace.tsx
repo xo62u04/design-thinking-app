@@ -1,110 +1,79 @@
 'use client';
 
 import { useState } from 'react';
-import { useDesignThinkingChat } from '@/hooks/useDesignThinkingChat';
+import { useCollaboration } from '@/hooks/useCollaboration';
 import { DesignThinkingStage } from '@/types/design-thinking';
 import ChatPanel from '@/components/ChatPanel';
 import ProgressBoard from '@/components/ProgressBoard';
-import WelcomeBack from '@/components/WelcomeBack';
-import ProjectSelector from '@/components/ProjectSelector';
+import CollaboratorAvatars from '@/components/CollaboratorAvatars';
+import InviteLinkShare from '@/components/InviteLinkShare';
 import {
   Sparkles,
   AlertCircle,
   MessageSquare,
   LayoutDashboard,
-  Plus,
   Save,
   Check,
-  Users,
   Loader2,
+  Users,
 } from 'lucide-react';
-import { isSupabaseEnabled } from '@/lib/supabase/client';
-import { createProject } from '@/lib/supabase/queries';
-import { useRouter } from 'next/navigation';
 
-export default function Home() {
-  const router = useRouter();
+interface CollaborativeWorkspaceProps {
+  projectId: string;
+  inviteCode: string;
+  collaboratorId: string;
+  nickname: string;
+  color: string;
+}
+
+export default function CollaborativeWorkspace({
+  projectId,
+  inviteCode,
+  collaboratorId,
+  nickname,
+  color,
+}: CollaborativeWorkspaceProps) {
   const [activeTab, setActiveTab] = useState<'chat' | 'progress'>('chat');
-  const [showWelcome, setShowWelcome] = useState(true);
   const [showSaveIndicator, setShowSaveIndicator] = useState(false);
-  const [isCreatingCollab, setIsCreatingCollab] = useState(false);
 
   const {
     projectState,
-    sendMessage,
     isLoading,
     error,
+    isInitialized,
+    onlineCollaborators,
+    sendMessage,
     switchCoach,
     switchStage,
     advanceToNextStage,
+    updateProjectName,
     stageCompletion,
     canAdvance,
-    isInitialized,
-    lastActivity,
-    hasStoredData,
-    dismissWelcomeBack,
-    resetProject,
-    updateProjectName,
-    switchProject,
-    deleteProjectById,
-    projectList,
-  } = useDesignThinkingChat('Design Thinking 專案');
+    currentCollaborator,
+  } = useCollaboration({
+    projectId,
+    collaboratorId,
+    nickname,
+    color,
+  });
 
   const handleStageClick = (stage: DesignThinkingStage) => {
     switchStage(stage);
   };
 
-  const handleContinue = () => {
-    setShowWelcome(false);
-    dismissWelcomeBack();
-  };
-
-  const handleNewProject = () => {
-    const name = prompt('請輸入新專案名稱：', 'Design Thinking 專案');
-    if (name) {
-      resetProject(name);
-    }
-    setShowWelcome(false);
-    dismissWelcomeBack();
-  };
-
-  // 顯示儲存指示器
   const handleSendMessage = async (content: string) => {
     await sendMessage(content);
-    // 顯示儲存成功提示
     setShowSaveIndicator(true);
     setTimeout(() => setShowSaveIndicator(false), 2000);
   };
 
-  // 建立協作專案
-  const handleCreateCollabProject = async () => {
-    if (!isSupabaseEnabled) {
-      alert('協作功能未啟用。請設定 Supabase 環境變數。');
-      return;
-    }
-
-    const name = prompt('請輸入協作專案名稱：', 'Design Thinking 協作專案');
-    if (!name) return;
-
-    setIsCreatingCollab(true);
-    try {
-      const project = await createProject(name);
-      router.push(`/project/${project.invite_code}`);
-    } catch (err) {
-      console.error('Failed to create collaborative project:', err);
-      alert('建立協作專案失敗，請稍後再試');
-    } finally {
-      setIsCreatingCollab(false);
-    }
-  };
-
-  // 載入中顯示
-  if (!isInitialized) {
+  // Loading state
+  if (!isInitialized || !projectState) {
     return (
       <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">載入中...</p>
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">載入協作空間中...</p>
         </div>
       </div>
     );
@@ -112,15 +81,6 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-      {/* Welcome Back Modal */}
-      {hasStoredData && showWelcome && lastActivity && (
-        <WelcomeBack
-          activity={lastActivity}
-          onContinue={handleContinue}
-          onNewProject={handleNewProject}
-        />
-      )}
-
       {/* Header */}
       <header className="flex-shrink-0 bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3">
@@ -141,11 +101,15 @@ export default function Home() {
                   >
                     {projectState.name}
                   </h1>
-                  {/* Save indicator */}
+                  {/* Collaboration badge */}
+                  <span className="flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">
+                    <Users className="w-3 h-3" />
+                    <span className="hidden sm:inline">協作中</span>
+                  </span>
                   {showSaveIndicator && (
                     <span className="flex items-center gap-1 text-xs text-green-600 animate-in fade-in">
                       <Check className="w-3 h-3" />
-                      <span className="hidden sm:inline">已儲存</span>
+                      <span className="hidden sm:inline">已同步</span>
                     </span>
                   )}
                 </div>
@@ -155,7 +119,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Loading indicator */}
               {isLoading && (
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-blue-600">
@@ -164,38 +128,14 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Project Selector */}
-              <ProjectSelector
-                currentProjectId={projectState.id}
-                projects={projectList}
-                onSelectProject={switchProject}
-                onDeleteProject={deleteProjectById}
+              {/* Collaborator Avatars */}
+              <CollaboratorAvatars
+                collaborators={onlineCollaborators}
+                currentUserId={collaboratorId}
               />
 
-              {/* New Project Button */}
-              <button
-                onClick={handleNewProject}
-                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                title="建立新專案"
-              >
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">新專案</span>
-              </button>
-
-              {/* Collaborative Project Button */}
-              <button
-                onClick={handleCreateCollabProject}
-                disabled={isCreatingCollab}
-                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                title="建立多人協作專案"
-              >
-                {isCreatingCollab ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Users className="w-4 h-4" />
-                )}
-                <span className="hidden sm:inline">協作</span>
-              </button>
+              {/* Invite Link */}
+              <InviteLinkShare inviteCode={inviteCode} />
             </div>
           </div>
         </div>
@@ -251,7 +191,6 @@ export default function Home() {
       <main className="flex-1 max-w-7xl mx-auto w-full p-2 sm:p-4 overflow-hidden">
         {/* Desktop: Side by side layout */}
         <div className="hidden lg:grid lg:grid-cols-3 gap-4 h-full">
-          {/* Left: Chat Panel */}
           <div className="lg:col-span-2 min-h-0">
             <ChatPanel
               messages={projectState.chatHistory}
@@ -259,10 +198,9 @@ export default function Home() {
               onSendMessage={handleSendMessage}
               onCoachChange={switchCoach}
               isLoading={isLoading}
+              showCollaborators
             />
           </div>
-
-          {/* Right: Progress Board */}
           <div className="lg:col-span-1 min-h-0">
             <ProgressBoard
               projectState={projectState}
@@ -283,6 +221,7 @@ export default function Home() {
               onSendMessage={handleSendMessage}
               onCoachChange={switchCoach}
               isLoading={isLoading}
+              showCollaborators
             />
           ) : (
             <ProgressBoard
@@ -296,15 +235,11 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Auto-save Status Bar */}
+      {/* Status Bar */}
       <div className="flex-shrink-0 bg-gray-50 border-t px-4 py-1 text-center">
         <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
           <Save className="w-3 h-3" />
-          自動儲存已啟用 · 上次更新：
-          {new Date(projectState.updatedAt).toLocaleTimeString('zh-TW', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
+          即時同步已啟用 · {onlineCollaborators.filter((c) => c.isOnline).length} 人在線
         </p>
       </div>
     </div>
