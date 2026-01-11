@@ -16,7 +16,10 @@ import {
   Check,
   Loader2,
   Users,
+  LogOut,
+  Home,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface CollaborativeWorkspaceProps {
   projectId: string;
@@ -33,6 +36,7 @@ export default function CollaborativeWorkspace({
   nickname,
   color,
 }: CollaborativeWorkspaceProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'chat' | 'progress'>('chat');
   const [showSaveIndicator, setShowSaveIndicator] = useState(false);
 
@@ -65,6 +69,18 @@ export default function CollaborativeWorkspace({
     await sendMessage(content);
     setShowSaveIndicator(true);
     setTimeout(() => setShowSaveIndicator(false), 2000);
+  };
+
+  const handleLeaveCollaboration = () => {
+    const confirm = window.confirm(
+      '確定要離開協作專案嗎？\n\n離開後您可以隨時透過邀請連結重新加入。'
+    );
+    if (confirm) {
+      // 清除協作 session
+      localStorage.removeItem('dt_collaboration_session');
+      // 返回首頁
+      router.push('/');
+    }
   };
 
   // Loading state
@@ -136,6 +152,16 @@ export default function CollaborativeWorkspace({
 
               {/* Invite Link */}
               <InviteLinkShare inviteCode={inviteCode} />
+
+              {/* Leave Collaboration Button */}
+              <button
+                onClick={handleLeaveCollaboration}
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                title="離開協作專案"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">離開</span>
+              </button>
             </div>
           </div>
         </div>
