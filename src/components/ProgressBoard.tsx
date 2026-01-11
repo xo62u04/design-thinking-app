@@ -29,6 +29,7 @@ import {
   Eye,
   Zap,
   HelpCircle,
+  Pen,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -75,6 +76,7 @@ interface ProgressBoardProps {
   stageCompletion?: Record<DesignThinkingStage, number>;
   canAdvance?: boolean;
   onAdvance?: () => void;
+  onOpenWhiteboard?: (prototypeId: string) => void;
 }
 
 export default function ProgressBoard({
@@ -83,6 +85,7 @@ export default function ProgressBoard({
   stageCompletion,
   canAdvance,
   onAdvance,
+  onOpenWhiteboard,
 }: ProgressBoardProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     stages: true,
@@ -431,7 +434,11 @@ export default function ProgressBoard({
               ) : (
                 <div className="space-y-2 sm:space-y-3">
                   {projectState.prototypes.map((prototype) => (
-                    <PrototypeCard key={prototype.id} prototype={prototype} />
+                    <PrototypeCard
+                      key={prototype.id}
+                      prototype={prototype}
+                      onOpenWhiteboard={onOpenWhiteboard}
+                    />
                   ))}
                 </div>
               )}
@@ -583,7 +590,13 @@ function IdeaCard({ idea }: { idea: Idea }) {
 }
 
 // 原型卡片組件
-function PrototypeCard({ prototype }: { prototype: Prototype }) {
+function PrototypeCard({
+  prototype,
+  onOpenWhiteboard,
+}: {
+  prototype: Prototype;
+  onOpenWhiteboard?: (prototypeId: string) => void;
+}) {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldTruncate = prototype.description.length > 80;
 
@@ -623,7 +636,7 @@ function PrototypeCard({ prototype }: { prototype: Prototype }) {
         )}
       </div>
       {prototype.features && prototype.features.length > 0 && (
-        <div>
+        <div className="mb-2">
           <span className="text-xs text-green-600 font-medium">功能特色：</span>
           <ul className="mt-1 space-y-0.5">
             {prototype.features.map((feature, idx) => (
@@ -634,6 +647,16 @@ function PrototypeCard({ prototype }: { prototype: Prototype }) {
             ))}
           </ul>
         </div>
+      )}
+      {/* 開啟白板按鈕 */}
+      {onOpenWhiteboard && (
+        <button
+          onClick={() => onOpenWhiteboard(prototype.id)}
+          className="w-full mt-2 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-md transition-colors"
+        >
+          <Pen className="w-3 h-3" />
+          開啟協作白板
+        </button>
       )}
     </div>
   );

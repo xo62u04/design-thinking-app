@@ -60,8 +60,13 @@ export interface Prototype {
   type: 'low_fidelity' | 'medium_fidelity' | 'high_fidelity';
   features: string[];
   feedbacks: PrototypeFeedback[];
+  whiteboardId?: string; // 關聯的白板 ID
   createdAt: string;
   updatedAt: string;
+  // 協作者資訊
+  collaboratorId?: string;
+  collaboratorNickname?: string;
+  collaboratorColor?: string;
 }
 
 // 原型回饋
@@ -71,6 +76,19 @@ export interface PrototypeFeedback {
   type: 'positive' | 'negative' | 'suggestion';
   source: string;
   createdAt: string;
+}
+
+// 白板（協作繪圖）
+export interface Whiteboard {
+  id: string;
+  projectId: string;
+  prototypeId?: string;
+  name: string;
+  elements: any[]; // Excalidraw 元素陣列
+  appState: Record<string, any>; // Excalidraw 應用狀態
+  createdAt: string;
+  updatedAt: string;
+  createdBy?: string;
 }
 
 // 階段進度

@@ -252,6 +252,36 @@ export interface Database {
           updated_at?: string;
         };
       };
+      whiteboards: {
+        Row: {
+          id: string;
+          project_id: string;
+          prototype_id: string | null;
+          name: string;
+          elements: Json;
+          app_state: Json;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          prototype_id?: string | null;
+          name: string;
+          elements?: Json;
+          app_state?: Json;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Update: {
+          name?: string;
+          elements?: Json;
+          app_state?: Json;
+          updated_at?: string;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

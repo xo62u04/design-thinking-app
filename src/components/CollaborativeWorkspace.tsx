@@ -20,6 +20,7 @@ import {
   Home,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createWhiteboard } from '@/lib/supabase/queries';
 
 interface CollaborativeWorkspaceProps {
   projectId: string;
@@ -81,6 +82,38 @@ export default function CollaborativeWorkspace({
       localStorage.removeItem('dt_collaboration_session');
       // 返回首頁
       router.push('/');
+    }
+  };
+
+  // 開啟或創建白板
+  const handleOpenWhiteboard = async (prototypeId: string) => {
+    if (!projectState) return;
+
+    try {
+      // 找到對應的原型
+      const prototype = projectState.prototypes.find((p) => p.id === prototypeId);
+      if (!prototype) {
+        alert('找不到原型');
+        return;
+      }
+
+      // 如果原型已有白板，直接開啟
+      if (prototype.whiteboardId) {
+        window.open(`/whiteboard/${prototype.whiteboardId}`, '_blank');
+        return;
+      }
+
+      // 創建新白板
+      const whiteboard = await createWhiteboard(projectId, collaboratorId, {
+        name: `${prototype.name} - 協作白板`,
+        prototypeId: prototype.id,
+      });
+
+      // 開啟白板
+      window.open(`/whiteboard/${whiteboard.id}`, '_blank');
+    } catch (error) {
+      console.error('Failed to open whiteboard:', error);
+      alert('開啟白板失敗，請稍後再試');
     }
   };
 
@@ -236,6 +269,7 @@ export default function CollaborativeWorkspace({
               stageCompletion={stageCompletion}
               canAdvance={canAdvance}
               onAdvance={advanceToNextStage}
+              onOpenWhiteboard={handleOpenWhiteboard}
             />
           </div>
         </div>
@@ -259,6 +293,7 @@ export default function CollaborativeWorkspace({
               stageCompletion={stageCompletion}
               canAdvance={canAdvance}
               onAdvance={advanceToNextStage}
+              onOpenWhiteboard={handleOpenWhiteboard}
             />
           )}
         </div>

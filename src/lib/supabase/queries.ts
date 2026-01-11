@@ -571,3 +571,100 @@ export async function loadFullProjectState(projectId: string): Promise<ProjectSt
     return null;
   }
 }
+
+// ============ Whiteboards ============
+
+export async function createWhiteboard(
+  projectId: string,
+  collaboratorId: string | null,
+  data: {
+    name: string;
+    prototypeId?: string;
+  }
+) {
+  const supabase = getSupabase();
+
+  const { data: whiteboard, error } = await supabase
+    .from('whiteboards')
+    .insert({
+      project_id: projectId,
+      prototype_id: data.prototypeId,
+      name: data.name,
+      elements: [],
+      app_state: {},
+      created_by: collaboratorId,
+    } as any)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return whiteboard as any;
+}
+
+export async function getWhiteboard(whiteboardId: string) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('whiteboards')
+    .select('*')
+    .eq('id', whiteboardId)
+    .single();
+
+  if (error) throw error;
+  return data as any;
+}
+
+export async function getProjectWhiteboards(projectId: string) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('whiteboards')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data as any[];
+}
+
+export async function updateWhiteboard(
+  whiteboardId: string,
+  data: {
+    elements?: any[];
+    appState?: Record<string, any>;
+    name?: string;
+  }
+) {
+  const supabase = getSupabase();
+
+  const updateData: {
+    elements?: any;
+    app_state?: any;
+    name?: string;
+  } = {};
+
+  if (data.elements !== undefined) updateData.elements = data.elements;
+  if (data.appState !== undefined) updateData.app_state = data.appState;
+  if (data.name !== undefined) updateData.name = data.name;
+
+  const { data: whiteboard, error } = await (supabase
+    .from('whiteboards') as any)
+    .update(updateData)
+    .eq('id', whiteboardId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return whiteboard as any;
+}
+
+export async function deleteWhiteboard(whiteboardId: string) {
+  const supabase = getSupabase();
+
+  const { error } = await supabase
+    .from('whiteboards')
+    .delete()
+    .eq('id', whiteboardId);
+
+  if (error) throw error;
+}
