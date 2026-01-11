@@ -143,6 +143,56 @@ describe('cleanResponseContent', () => {
     expect(cleaned).not.toContain('NEXT_STAGE');
     expect(cleaned).toContain('已達成目標');
   });
+
+  it('應移除標籤文字（💾 **JSON action**：）', () => {
+    const response = `很好的觀察！
+
+📌 **洞察**：用戶感到困惑
+
+💾 **JSON action**：
+\`\`\`json:action
+{"type": "ADD_OBSERVATION", "data": {...}}
+\`\`\``;
+    const cleaned = cleanResponseContent(response);
+
+    expect(cleaned).toBe('很好的觀察！\n\n📌 **洞察**：用戶感到困惑');
+    expect(cleaned).not.toContain('💾');
+    expect(cleaned).not.toContain('JSON action');
+  });
+
+  it('應移除標籤文字（💾 **第二部分：JSON action（必須有！）**）', () => {
+    const response = `太好了！讓我記錄這個需求：
+
+⚡ **需求**：希望有簡單的學習資源
+
+💾 **第二部分：JSON action（必須有！）**
+\`\`\`json:action
+{"type": "ADD_OBSERVATION", "data": {...}}
+\`\`\``;
+    const cleaned = cleanResponseContent(response);
+
+    expect(cleaned).toBe('太好了！讓我記錄這個需求：\n\n⚡ **需求**：希望有簡單的學習資源');
+    expect(cleaned).not.toContain('💾');
+    expect(cleaned).not.toContain('第二部分');
+    expect(cleaned).not.toContain('JSON action');
+  });
+
+  it('應移除標籤文字（🗣️ **第一部分：對話內容**）', () => {
+    const response = `🗣️ **第一部分：對話內容**
+很好的觀察！我已經記錄了這個重要發現：
+
+📌 **洞察**：用戶感到困惑
+
+\`\`\`json:action
+{"type": "ADD_OBSERVATION", "data": {...}}
+\`\`\``;
+    const cleaned = cleanResponseContent(response);
+
+    expect(cleaned).toBe('很好的觀察！我已經記錄了這個重要發現：\n\n📌 **洞察**：用戶感到困惑');
+    expect(cleaned).not.toContain('🗣️');
+    expect(cleaned).not.toContain('第一部分');
+    expect(cleaned).not.toContain('對話內容');
+  });
 });
 
 describe('applyAction', () => {

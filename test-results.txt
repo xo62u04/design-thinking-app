@@ -1,0 +1,69 @@
+
+> design-thinking-app@0.1.0 test:coverage
+> vitest run --coverage
+
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90mF:/AI/claude_code/design-thinking-app[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [32m✓[39m src/constants/__tests__/prompts.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+[90mstderr[2m | src/lib/__tests__/state-updater.test.ts[2m > [22m[2mparseActionsFromResponse[2m > [22m[2m應正確處理格式錯誤的 JSON
+[22m[39mFailed to parse action JSON: SyntaxError: Expected ',' or '}' after property value in JSON at position 32 (line 3 column 3)
+    at JSON.parse (<anonymous>)
+    at parseActionsFromResponse (F:/AI/claude_code/design-thinking-app/src/lib/state-updater.ts:37:27)
+    at F:/AI/claude_code/design-thinking-app/src/lib/__tests__/state-updater.test.ts:85:21
+    at [90mfile:///F:/AI/claude_code/design-thinking-app/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:145:11
+    at [90mfile:///F:/AI/claude_code/design-thinking-app/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:915:26
+    at [90mfile:///F:/AI/claude_code/design-thinking-app/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///F:/AI/claude_code/design-thinking-app/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///F:/AI/claude_code/design-thinking-app/[39mnode_modules/[4m@vitest[24m/runner/dist/index.js:1653:37
+    at Traces.$ [90m(file:///F:/AI/claude_code/design-thinking-app/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+
+ [32m✓[39m src/lib/__tests__/state-updater.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+[90mstdout[2m | src/hooks/__tests__/useDesignThinkingChat.integration.test.ts[2m > [22m[2m完整設計思考流程測試[2m > [22m[2m應該能夠完成完整的設計思考流程（同理 → 定義 → 發想 → 原型 → 測試）
+[22m[39m✅ 成功進入測試階段
+✅ 完整設計思考流程測試通過！
+📊 總共完成 40 次對話
+📋 收集 3 個觀察
+🎯 建立 1 個 POV
+💡 產生 15 個點子
+📦 建立 1 個原型
+
+[90mstderr[2m | src/hooks/__tests__/useDesignThinkingChat.integration.test.ts[2m > [22m[2m完整設計思考流程測試[2m > [22m[2m應該能夠在任何階段中途停止並儲存進度
+[22m[39mAn update to TestComponent inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m src/hooks/__tests__/useDesignThinkingChat.integration.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 661[2mms[22m[39m
+     [33m[2m✓[22m[39m 應該能夠在任何階段中途停止並儲存進度 [33m 606[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[32m38 passed[39m[22m[90m (38)[39m
+[2m   Start at [22m 17:46:38
+[2m   Duration [22m 2.84s[2m (transform 224ms, setup 987ms, import 555ms, tests 690ms, environment 3.05s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   67.79 |    61.17 |   66.66 |    72.6 |                   
+ constants         |     100 |      100 |     100 |     100 |                   
+  prompts.ts       |     100 |      100 |     100 |     100 |                   
+ hooks             |   74.24 |    63.93 |      60 |   77.86 |                   
+  ...inkingChat.ts |   74.24 |    63.93 |      60 |   77.86 | ...88,293-295,305 
+ lib               |   61.62 |    59.84 |   72.41 |   67.08 |                   
+  state-updater.ts |   91.04 |    74.13 |     100 |   95.16 | 72,210,250        
+  storage.ts       |   44.91 |    47.82 |   55.55 |   49.49 | ...40,243,262-299 
+-------------------|---------|----------|---------|---------|-------------------
+ERROR: Coverage for lines (72.6%) does not meet global threshold (80%)
+ERROR: Coverage for functions (66.66%) does not meet global threshold (80%)
+ERROR: Coverage for statements (67.79%) does not meet global threshold (80%)
+ERROR: Coverage for branches (61.17%) does not meet global threshold (80%)

@@ -57,8 +57,17 @@ export function parseActionsFromResponse(response: string): Action[] {
 // 移除回應中的 action JSON 區塊，只保留對話內容
 export function cleanResponseContent(response: string): string {
   return response
+    // 移除 JSON action 區塊
     .replace(/```json:action\s*[\s\S]*?```/g, '')
+    // 移除 NEXT_STAGE action
     .replace(/\{\s*"action"\s*:\s*"NEXT_STAGE"\s*\}/g, '')
+    // 移除可能出現的標籤文字（各種變體）
+    .replace(/💾\s*\*\*.*?JSON\s*action.*?\*\*[：:]*\s*\n*/gi, '')
+    .replace(/🗣️\s*\*\*.*?對話內容.*?\*\*[：:]*\s*\n*/gi, '')
+    .replace(/\*\*第[一二]部分[：:]\s*.*?\*\*\s*\n*/g, '')
+    // 移除單獨的表情符號行
+    .replace(/^\s*💾\s*$/gm, '')
+    .replace(/^\s*🗣️\s*$/gm, '')
     .trim();
 }
 
