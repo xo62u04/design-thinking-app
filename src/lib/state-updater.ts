@@ -34,9 +34,19 @@ export function parseActionsFromResponse(response: string): Action[] {
   while ((match = actionPattern.exec(response)) !== null) {
     try {
       const jsonStr = match[1].trim();
-      const action = JSON.parse(jsonStr) as Action;
-      if (action.type) {
-        actions.push(action);
+      const parsed = JSON.parse(jsonStr);
+
+      // 支援單個物件或陣列格式
+      if (Array.isArray(parsed)) {
+        // 如果是陣列，逐一加入
+        parsed.forEach((item) => {
+          if (item.type) {
+            actions.push(item as Action);
+          }
+        });
+      } else if (parsed.type) {
+        // 如果是單個物件
+        actions.push(parsed as Action);
       }
     } catch (e) {
       console.error('Failed to parse action JSON:', e);

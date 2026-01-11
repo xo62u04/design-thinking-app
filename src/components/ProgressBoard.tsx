@@ -6,6 +6,8 @@ import {
   StageProgress,
   UserObservation,
   POVStatement,
+  Idea,
+  Prototype,
 } from '@/types/design-thinking';
 import { COACH_CONFIG, STAGE_TO_COACH } from '@/constants/prompts';
 import {
@@ -86,6 +88,8 @@ export default function ProgressBoard({
     stages: true,
     observations: true,
     povs: true,
+    ideas: true,
+    prototypes: true,
     stats: true,
   });
 
@@ -349,6 +353,92 @@ export default function ProgressBoard({
           )}
         </div>
 
+        {/* Ideas Section */}
+        <div className="border-b">
+          <button
+            onClick={() => toggleSection('ideas')}
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between hover:bg-gray-50"
+          >
+            <div className="flex items-center gap-2">
+              <Lightbulb className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-500" />
+              <span className="text-xs sm:text-sm font-medium text-gray-700">
+                創意點子
+              </span>
+              <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-yellow-100 text-yellow-600 rounded-full">
+                {projectState.ideas.length}
+              </span>
+            </div>
+            {expandedSections.ideas ? (
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
+
+          {expandedSections.ideas && (
+            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+              {projectState.ideas.length === 0 ? (
+                <div className="text-center py-3 sm:py-4">
+                  <Lightbulb className="w-6 h-6 sm:w-8 sm:h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-xs sm:text-sm text-gray-400">尚無創意點子</p>
+                  <p className="text-xs text-gray-300 mt-1">
+                    與發想教練產生點子
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 sm:space-y-3">
+                  {projectState.ideas.map((idea) => (
+                    <IdeaCard key={idea.id} idea={idea} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Prototypes Section */}
+        <div className="border-b">
+          <button
+            onClick={() => toggleSection('prototypes')}
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between hover:bg-gray-50"
+          >
+            <div className="flex items-center gap-2">
+              <Box className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
+              <span className="text-xs sm:text-sm font-medium text-gray-700">
+                原型設計
+              </span>
+              <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-green-100 text-green-600 rounded-full">
+                {projectState.prototypes.length}
+              </span>
+            </div>
+            {expandedSections.prototypes ? (
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
+
+          {expandedSections.prototypes && (
+            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+              {projectState.prototypes.length === 0 ? (
+                <div className="text-center py-3 sm:py-4">
+                  <Box className="w-6 h-6 sm:w-8 sm:h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-xs sm:text-sm text-gray-400">尚無原型設計</p>
+                  <p className="text-xs text-gray-300 mt-1">
+                    與原型教練建立原型
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 sm:space-y-3">
+                  {projectState.prototypes.map((prototype) => (
+                    <PrototypeCard key={prototype.id} prototype={prototype} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Quick Stats */}
         <div>
           <button
@@ -401,23 +491,150 @@ export default function ProgressBoard({
 
 // POV 卡片組件
 function POVCard({ pov }: { pov: POVStatement }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldTruncate = pov.statement.length > 80;
+
   return (
     <div className="p-2 sm:p-3 bg-blue-50 rounded-lg border border-blue-200">
-      <p className="text-xs sm:text-sm text-blue-800 font-medium mb-2 break-words">{pov.statement}</p>
+      <div className="mb-2">
+        <p className={`text-xs sm:text-sm text-blue-800 font-medium break-words ${!isExpanded && shouldTruncate ? 'line-clamp-2' : ''}`}>
+          {pov.statement}
+        </p>
+        {shouldTruncate && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-xs text-blue-600 hover:text-blue-700 mt-1 font-medium"
+          >
+            {isExpanded ? '收合' : '展開全部'}
+          </button>
+        )}
+      </div>
       <div className="grid grid-cols-3 gap-1 sm:gap-2 text-xs">
         <div className="min-w-0">
-          <span className="text-blue-500">使用者</span>
-          <p className="text-gray-600 truncate">{pov.user || '-'}</p>
+          <span className="text-blue-500 block">使用者</span>
+          <p className="text-gray-600 break-words">{pov.user || '-'}</p>
         </div>
         <div className="min-w-0">
-          <span className="text-blue-500">需求</span>
-          <p className="text-gray-600 truncate">{pov.need || '-'}</p>
+          <span className="text-blue-500 block">需求</span>
+          <p className="text-gray-600 break-words">{pov.need || '-'}</p>
         </div>
         <div className="min-w-0">
-          <span className="text-blue-500">洞察</span>
-          <p className="text-gray-600 truncate">{pov.insight || '-'}</p>
+          <span className="text-blue-500 block">洞察</span>
+          <p className="text-gray-600 break-words">{pov.insight || '-'}</p>
         </div>
       </div>
+    </div>
+  );
+}
+
+// 點子卡片組件
+function IdeaCard({ idea }: { idea: Idea }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldTruncate = idea.description.length > 80;
+
+  const statusLabels = {
+    raw: '初步',
+    refined: '精煉',
+    selected: '已選',
+    discarded: '捨棄',
+  };
+
+  const statusColors = {
+    raw: 'bg-gray-100 text-gray-700',
+    refined: 'bg-blue-100 text-blue-700',
+    selected: 'bg-green-100 text-green-700',
+    discarded: 'bg-red-100 text-red-700',
+  };
+
+  return (
+    <div className="p-2 sm:p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <h4 className="text-xs sm:text-sm text-yellow-800 font-medium break-words flex-1">
+          {idea.title}
+        </h4>
+        <span className={`flex-shrink-0 px-1.5 py-0.5 text-xs rounded ${statusColors[idea.status]}`}>
+          {statusLabels[idea.status]}
+        </span>
+      </div>
+      <div className="mb-2">
+        <p className={`text-xs text-gray-700 break-words ${!isExpanded && shouldTruncate ? 'line-clamp-2' : ''}`}>
+          {idea.description}
+        </p>
+        {shouldTruncate && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-xs text-yellow-600 hover:text-yellow-700 mt-1 font-medium"
+          >
+            {isExpanded ? '收合' : '展開全部'}
+          </button>
+        )}
+      </div>
+      {idea.tags && idea.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {idea.tags.map((tag, idx) => (
+            <span key={idx} className="px-1.5 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// 原型卡片組件
+function PrototypeCard({ prototype }: { prototype: Prototype }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const shouldTruncate = prototype.description.length > 80;
+
+  const typeLabels = {
+    low_fidelity: '低保真',
+    medium_fidelity: '中保真',
+    high_fidelity: '高保真',
+  };
+
+  const typeColors = {
+    low_fidelity: 'bg-green-100 text-green-700',
+    medium_fidelity: 'bg-blue-100 text-blue-700',
+    high_fidelity: 'bg-purple-100 text-purple-700',
+  };
+
+  return (
+    <div className="p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <h4 className="text-xs sm:text-sm text-green-800 font-medium break-words flex-1">
+          {prototype.name}
+        </h4>
+        <span className={`flex-shrink-0 px-1.5 py-0.5 text-xs rounded ${typeColors[prototype.type]}`}>
+          {typeLabels[prototype.type]}
+        </span>
+      </div>
+      <div className="mb-2">
+        <p className={`text-xs text-gray-700 break-words ${!isExpanded && shouldTruncate ? 'line-clamp-2' : ''}`}>
+          {prototype.description}
+        </p>
+        {shouldTruncate && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-xs text-green-600 hover:text-green-700 mt-1 font-medium"
+          >
+            {isExpanded ? '收合' : '展開全部'}
+          </button>
+        )}
+      </div>
+      {prototype.features && prototype.features.length > 0 && (
+        <div>
+          <span className="text-xs text-green-600 font-medium">功能特色：</span>
+          <ul className="mt-1 space-y-0.5">
+            {prototype.features.map((feature, idx) => (
+              <li key={idx} className="text-xs text-gray-700 flex items-start gap-1">
+                <span className="text-green-500 mt-0.5">•</span>
+                <span className="break-words flex-1">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
