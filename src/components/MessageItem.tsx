@@ -61,6 +61,16 @@ export default function MessageItem({
     }
   };
 
+  // Debug: 在開發環境中顯示按鈕狀態
+  if (process.env.NODE_ENV === 'development' && !isUser) {
+    console.log('MessageItem Debug:', {
+      coachType: message.coachType,
+      hasCallback: !!onRetryRecording,
+      shouldShow: shouldShowRetryButton,
+      isRetrying,
+    });
+  }
+
   return (
     <div
       className={`flex gap-2 sm:gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}

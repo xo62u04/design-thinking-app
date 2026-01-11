@@ -47,6 +47,7 @@ export default function CollaborativeWorkspace({
     isInitialized,
     onlineCollaborators,
     sendMessage,
+    retryRecording,
     switchCoach,
     switchStage,
     advanceToNextStage,
@@ -223,6 +224,7 @@ export default function CollaborativeWorkspace({
               activeCoach={projectState.activeCoach}
               onSendMessage={handleSendMessage}
               onCoachChange={switchCoach}
+              onRetryRecording={retryRecording}
               isLoading={isLoading}
               showCollaborators
             />
@@ -246,6 +248,7 @@ export default function CollaborativeWorkspace({
               activeCoach={projectState.activeCoach}
               onSendMessage={handleSendMessage}
               onCoachChange={switchCoach}
+              onRetryRecording={retryRecording}
               isLoading={isLoading}
               showCollaborators
             />
