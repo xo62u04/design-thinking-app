@@ -1,0 +1,16 @@
+{
+  "description": "測試相關依賴安裝清單",
+  "devDependencies": {
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/user-event": "^14.5.1",
+    "happy-dom": "^12.10.3",
+    "@playwright/test": "^1.40.0",
+    "k6": "^0.0.0",
+    "msw": "^2.0.0"
+  },
+  "installCommand": "npm install --save-dev vitest @vitest/ui @vitest/coverage-v8 @testing-library/react @testing-library/jest-dom @testing-library/user-event happy-dom @playwright/test msw"
+}
