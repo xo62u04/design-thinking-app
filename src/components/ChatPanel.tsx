@@ -14,6 +14,7 @@ import {
   FlaskConical,
   ChevronLeft,
   ChevronRight,
+  HelpCircle,
 } from 'lucide-react';
 
 const iconMap = {
@@ -61,6 +62,12 @@ export default function ChatPanel({
     if (input.trim() && !isLoading) {
       onSendMessage(input.trim());
       setInput('');
+    }
+  };
+
+  const handleAskForHint = () => {
+    if (!isLoading) {
+      onSendMessage('請給我一些提示，我不太確定接下來該怎麼做。');
     }
   };
 
@@ -202,6 +209,17 @@ export default function ChatPanel({
             disabled={isLoading}
             className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
+          {/* Ask for hint button */}
+          <button
+            type="button"
+            onClick={handleAskForHint}
+            disabled={isLoading}
+            className="flex-shrink-0 w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2.5 bg-purple-100 text-purple-600 rounded-full hover:bg-purple-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-1.5"
+            title="向教練請求提示"
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span className="hidden sm:inline text-sm font-medium">提問</span>
+          </button>
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
