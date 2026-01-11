@@ -381,6 +381,20 @@ export async function addPrototypeFeedback(
   return inserted as any;
 }
 
+export async function updatePrototypeWhiteboardId(
+  prototypeId: string,
+  whiteboardId: string
+) {
+  const supabase = getSupabase();
+
+  const { error } = await (supabase
+    .from('prototypes') as any)
+    .update({ whiteboard_id: whiteboardId })
+    .eq('id', prototypeId);
+
+  if (error) throw error;
+}
+
 // ============ Chat Messages ============
 
 export async function addChatMessage(
@@ -539,6 +553,7 @@ export async function loadFullProjectState(projectId: string): Promise<ProjectSt
         description: p.description,
         type: p.type,
         features: p.features,
+        whiteboardId: p.whiteboard_id || undefined,
         createdAt: p.created_at,
         updatedAt: p.updated_at,
         feedbacks: (p.feedbacks || []).map((f: any) => ({

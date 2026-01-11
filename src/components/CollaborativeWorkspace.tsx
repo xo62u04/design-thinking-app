@@ -20,7 +20,7 @@ import {
   Home,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { createWhiteboard } from '@/lib/supabase/queries';
+import { createWhiteboard, updatePrototypeWhiteboardId } from '@/lib/supabase/queries';
 
 interface CollaborativeWorkspaceProps {
   projectId: string;
@@ -108,6 +108,9 @@ export default function CollaborativeWorkspace({
         name: `${prototype.name} - 協作白板`,
         prototypeId: prototype.id,
       });
+
+      // 更新原型的 whiteboardId
+      await updatePrototypeWhiteboardId(prototype.id, whiteboard.id);
 
       // 開啟白板
       window.open(`/whiteboard/${whiteboard.id}`, '_blank');

@@ -162,6 +162,55 @@ export function useCollaboration({
               };
             });
           },
+          onPrototypeInsert: (payload) => {
+            if (!mounted) return;
+            const newPrototype = payload.new;
+            setProjectState((prev) => {
+              if (!prev) return prev;
+              if (prev.prototypes.some((p) => p.id === newPrototype.id)) return prev;
+              return {
+                ...prev,
+                prototypes: [
+                  ...prev.prototypes,
+                  {
+                    id: newPrototype.id,
+                    name: newPrototype.name,
+                    description: newPrototype.description,
+                    type: newPrototype.type,
+                    features: newPrototype.features,
+                    feedbacks: [],
+                    whiteboardId: newPrototype.whiteboard_id || undefined,
+                    createdAt: newPrototype.created_at,
+                    updatedAt: newPrototype.updated_at,
+                    collaboratorId: newPrototype.collaborator_id,
+                  },
+                ],
+              };
+            });
+          },
+          onPrototypeUpdate: (payload) => {
+            if (!mounted) return;
+            const updated = payload.new;
+            setProjectState((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                prototypes: prev.prototypes.map((p) =>
+                  p.id === updated.id
+                    ? {
+                        ...p,
+                        name: updated.name,
+                        description: updated.description,
+                        type: updated.type,
+                        features: updated.features,
+                        whiteboardId: updated.whiteboard_id || undefined,
+                        updatedAt: updated.updated_at,
+                      }
+                    : p
+                ),
+              };
+            });
+          },
           onMessageInsert: (payload) => {
             if (!mounted) return;
             const newMsg = payload.new;

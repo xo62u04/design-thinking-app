@@ -162,6 +162,7 @@ export interface Database {
           description: string;
           type: PrototypeType;
           features: string[];
+          whiteboard_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -173,6 +174,7 @@ export interface Database {
           description?: string;
           type?: PrototypeType;
           features?: string[];
+          whiteboard_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -181,6 +183,7 @@ export interface Database {
           description?: string;
           type?: PrototypeType;
           features?: string[];
+          whiteboard_id?: string | null;
           updated_at?: string;
         };
       };
