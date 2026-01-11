@@ -7,6 +7,9 @@ import { getSupabase } from '@/lib/supabase/client';
 import { Loader2, Users, Save, Check } from 'lucide-react';
 import type { Whiteboard } from '@/types/design-thinking';
 
+// 引入 Excalidraw 樣式
+import '@excalidraw/excalidraw/index.css';
+
 // 動態導入 Excalidraw（避免 SSR 問題）
 const Excalidraw = dynamic(
   async () => (await import('@excalidraw/excalidraw')).Excalidraw,
@@ -165,7 +168,7 @@ export default function CollaborativeWhiteboard({
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">載入白板中...</p>
@@ -176,7 +179,7 @@ export default function CollaborativeWhiteboard({
 
   if (!whiteboard) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="text-red-600">無法載入白板</p>
         </div>
@@ -185,9 +188,9 @@ export default function CollaborativeWhiteboard({
   }
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="fixed inset-0 flex flex-col bg-white overflow-hidden">
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b bg-gray-50 flex items-center justify-between">
+      <div className="flex-shrink-0 px-4 py-3 border-b bg-gray-50 flex items-center justify-between z-10">
         <div>
           <h1 className="text-lg font-semibold text-gray-800">{whiteboard.name}</h1>
           <p className="text-xs text-gray-500">協作白板</p>
@@ -215,7 +218,7 @@ export default function CollaborativeWhiteboard({
       </div>
 
       {/* Excalidraw 白板 */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 w-full h-full overflow-hidden">
         <Excalidraw
           initialData={{
             elements: whiteboard.elements,

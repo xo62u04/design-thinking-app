@@ -36,7 +36,7 @@ export default function WhiteboardPage({
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">載入中...</p>
@@ -50,11 +50,13 @@ export default function WhiteboardPage({
   }
 
   return (
-    <CollaborativeWhiteboard
-      whiteboardId={unwrappedParams.whiteboardId}
-      collaboratorId={collaborationSession.collaboratorId}
-      nickname={collaborationSession.nickname}
-      color={collaborationSession.color}
-    />
+    <div className="fixed inset-0 overflow-hidden">
+      <CollaborativeWhiteboard
+        whiteboardId={unwrappedParams.whiteboardId}
+        collaboratorId={collaborationSession.collaboratorId}
+        nickname={collaborationSession.nickname}
+        color={collaborationSession.color}
+      />
+    </div>
   );
 }
