@@ -92,38 +92,64 @@ ${contextInfo}
 
 ${stageGuidelines}
 
-## 回應格式指引
-當學員提供了可以被記錄的內容時，請在回應最後使用 JSON 格式標記需要儲存的資料：
+## 🚨 回應格式規則（必須遵守）
+
+### 規則 1：絕對禁止只輸出 JSON
+❌ 錯誤示範（會導致用戶看到空白）：
+讓我將這個洞察記錄下來：
 \`\`\`json:action
-{
-  "type": "ADD_OBSERVATION" | "ADD_POV" | "ADD_IDEA" | "ADD_PROTOTYPE" | "NEXT_STAGE",
-  "data": { ... }
-}
+{"type": "ADD_OBSERVATION", "data": {...}}
 \`\`\`
 
-例如，當學員分享了一個使用者痛點：
+### 規則 2：正確的回應格式
+當你需要記錄觀察、POV、點子時，你的回應必須包含兩部分：
+
+**第一部分：對話內容（必須包含記錄的具體內容）**
+使用表情符號和清晰的格式，把記錄的內容完整寫出來給用戶看。
+
+**第二部分：JSON action（放在最後）**
+用於系統儲存資料。
+
+### ✅ 正確示範 1：記錄觀察
+
+很好的觀察！我已經記錄了這個重要發現：
+
+📌 **洞察**：年輕人認為期貨比加密貨幣更有保障，因為有專業人員監管，不像加密貨幣充斥詐騙
+
+這個觀察點出了「信任感」的重要性。讓我們繼續探討...
+
 \`\`\`json:action
 {
   "type": "ADD_OBSERVATION",
   "data": {
-    "content": "使用者在結帳時常常找不到優惠券入口",
+    "content": "年輕人認為期貨比加密貨幣更有保障，因為有專業人員監管，不像加密貨幣充斥詐騙",
+    "category": "insight"
+  }
+}
+\`\`\`
+
+### ✅ 正確示範 2：記錄痛點
+
+這是一個關鍵痛點！我已記錄：
+
+😞 **痛點**：加密貨幣KYC雖然也存在，但審核速度比期貨快很多，年輕人等不及
+
+這反映了效率 vs. 安全的權衡問題。
+
+\`\`\`json:action
+{
+  "type": "ADD_OBSERVATION",
+  "data": {
+    "content": "加密貨幣KYC雖然也存在，但審核速度比期貨快很多，年輕人等不及",
     "category": "pain_point"
   }
 }
 \`\`\`
 
-當學員完成 POV 陳述：
-\`\`\`json:action
-{
-  "type": "ADD_POV",
-  "data": {
-    "user": "忙碌的上班族",
-    "need": "快速找到優惠",
-    "insight": "他們認為省時比省錢更重要",
-    "statement": "忙碌的上班族需要快速找到優惠，因為他們認為省時比省錢更重要"
-  }
-}
-\`\`\`
+### 重要提醒
+- 觀察內容的 category 可選：pain_point（痛點）、behavior（行為）、need（需求）、insight（洞察）
+- 對話內容必須完整包含你要記錄的資訊
+- 用表情符號讓內容更易讀：📌💡😞👁️⚡🎯
 `;
 }
 
@@ -135,11 +161,11 @@ function getStageGuidelines(stage: string, projectState: ProjectState): string {
       const remainingObservations = Math.max(0, 3 - observations.length);
       return `
 ## 同理心階段指引
-- 目標：收集至少 3 個關鍵洞察
-- 目前進度：已收集 ${observations.length} 個，還需 ${remainingObservations} 個
+- 目標：收集至少 3 個關鍵洞察（可以收集更多，沒有上限）
+- 目前進度：已收集 ${observations.length} 個${observations.length < 3 ? `，還需 ${remainingObservations} 個達到最低目標` : ''}
 - 使用 5 Whys 技巧深入挖掘
-- 當收集到 3 個以上洞察時，可以建議進入下一階段
-${observations.length >= 3 ? '✅ 已達成最低目標，可以考慮進入定義階段' : ''}`;
+- 持續收集洞察，直到學員覺得足夠為止
+${observations.length >= 3 ? '✅ 已達成最低目標，可繼續收集更多或進入定義階段' : ''}`;
 
     case 'define':
       return `
