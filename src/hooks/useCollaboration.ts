@@ -484,25 +484,66 @@ export function useCollaboration({
 
 內容：${messageContent}
 
-請輸出對應的 JSON action 來記錄這個觀察。`;
+請輸出對應的 JSON action 來記錄這個觀察。格式範例：
+\`\`\`json:action
+{
+  "type": "ADD_OBSERVATION",
+  "data": {
+    "content": "觀察內容",
+    "category": "insight"
+  }
+}
+\`\`\``;
         } else if (coach === 'define') {
           retryPrompt = `請仔細閱讀以下內容，並將其中提到的 POV 陳述記錄下來。只輸出 JSON action，不需要對話內容。
 
 內容：${messageContent}
 
-請輸出對應的 JSON action 來記錄這個 POV。`;
+請輸出對應的 JSON action 來記錄這個 POV。必須包含 user（使用者）、need（需求）、insight（洞察）、statement（完整陳述）四個欄位。格式範例：
+\`\`\`json:action
+{
+  "type": "ADD_POV",
+  "data": {
+    "user": "使用者角色",
+    "need": "需求描述",
+    "insight": "洞察發現",
+    "statement": "完整的 POV 陳述"
+  }
+}
+\`\`\``;
         } else if (coach === 'ideate') {
           retryPrompt = `請仔細閱讀以下內容，並將其中提到的點子記錄下來。只輸出 JSON action，不需要對話內容。
 
 內容：${messageContent}
 
-請輸出對應的 JSON action 來記錄這個點子。`;
+請輸出對應的 JSON action 來記錄這個點子。格式範例：
+\`\`\`json:action
+{
+  "type": "ADD_IDEA",
+  "data": {
+    "title": "點子標題",
+    "description": "點子描述",
+    "tags": ["標籤1", "標籤2"]
+  }
+}
+\`\`\``;
         } else if (coach === 'prototype') {
           retryPrompt = `請仔細閱讀以下內容，並將其中提到的原型記錄下來。只輸出 JSON action，不需要對話內容。
 
 內容：${messageContent}
 
-請輸出對應的 JSON action 來記錄這個原型。`;
+請輸出對應的 JSON action 來記錄這個原型。格式範例：
+\`\`\`json:action
+{
+  "type": "ADD_PROTOTYPE",
+  "data": {
+    "name": "原型名稱",
+    "description": "原型描述",
+    "type": "low_fidelity",
+    "features": ["功能1", "功能2"]
+  }
+}
+\`\`\``;
         } else {
           // 其他教練不支持補救記錄
           setIsLoading(false);
