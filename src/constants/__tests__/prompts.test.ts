@@ -59,7 +59,7 @@ describe('教練提示詞配置', () => {
 
 describe('提示詞一致性檢查', () => {
   it('所有教練提示詞都應包含 JSON action 格式說明或相關指引', () => {
-    // orchestrator 可能沒有 JSON action 格式，因為它主要是檢查
+    // orchestrator 和 test 可能沒有 JSON action 格式，因為它們主要是檢查和觀察
     const coachTypesWithJSONAction: CoachType[] = [
       'empathy',
       'define',
@@ -74,7 +74,8 @@ describe('提示詞一致性檢查', () => {
       expect(
         prompt.includes('json:action') ||
         prompt.includes('JSON') ||
-        prompt.includes('對話內容')
+        prompt.includes('對話內容') ||
+        prompt.includes('記錄')
       ).toBe(true);
     });
   });

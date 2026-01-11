@@ -22,9 +22,13 @@ const localStorageMock = (() => {
 global.localStorage = localStorageMock as any;
 
 // Mock crypto.randomUUID
-global.crypto = {
-  randomUUID: () => Math.random().toString(36).substring(7),
-} as any;
+Object.defineProperty(global, 'crypto', {
+  value: {
+    randomUUID: () => Math.random().toString(36).substring(7),
+  },
+  writable: true,
+  configurable: true,
+});
 
 // Mock fetch
 global.fetch = vi.fn();
