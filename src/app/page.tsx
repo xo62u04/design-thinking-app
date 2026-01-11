@@ -34,6 +34,7 @@ export default function Home() {
     sendMessage,
     isLoading,
     error,
+    retryRecording,
     switchCoach,
     switchStage,
     advanceToNextStage,
@@ -258,6 +259,7 @@ export default function Home() {
               activeCoach={projectState.activeCoach}
               onSendMessage={handleSendMessage}
               onCoachChange={switchCoach}
+              onRetryRecording={retryRecording}
               isLoading={isLoading}
             />
           </div>
@@ -282,6 +284,7 @@ export default function Home() {
               activeCoach={projectState.activeCoach}
               onSendMessage={handleSendMessage}
               onCoachChange={switchCoach}
+              onRetryRecording={retryRecording}
               isLoading={isLoading}
             />
           ) : (

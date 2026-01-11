@@ -31,6 +31,7 @@ interface ChatPanelProps {
   activeCoach: CoachType;
   onSendMessage: (content: string) => void;
   onCoachChange: (coach: CoachType) => void;
+  onRetryRecording?: (messageContent: string) => void;
   isLoading?: boolean;
   showCollaborators?: boolean;
 }
@@ -40,6 +41,7 @@ export default function ChatPanel({
   activeCoach,
   onSendMessage,
   onCoachChange,
+  onRetryRecording,
   isLoading = false,
   showCollaborators = false,
 }: ChatPanelProps) {
@@ -170,6 +172,8 @@ export default function ChatPanel({
                 key={message.id}
                 message={message}
                 showCollaborator={showCollaborators}
+                onRetryRecording={onRetryRecording}
+                isRetrying={isLoading}
               />
             ))}
             {/* Typing indicator */}

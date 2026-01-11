@@ -10,6 +10,7 @@ import {
   Box,
   FlaskConical,
   User,
+  Save,
 } from 'lucide-react';
 
 const iconMap = {
@@ -24,9 +25,16 @@ const iconMap = {
 interface MessageItemProps {
   message: ChatMessage;
   showCollaborator?: boolean;
+  onRetryRecording?: (messageContent: string) => void;
+  isRetrying?: boolean;
 }
 
-export default function MessageItem({ message, showCollaborator = false }: MessageItemProps) {
+export default function MessageItem({
+  message,
+  showCollaborator = false,
+  onRetryRecording,
+  isRetrying = false,
+}: MessageItemProps) {
   const isUser = message.role === 'user';
   const coachConfig = message.coachType
     ? COACH_CONFIG[message.coachType]
@@ -39,6 +47,19 @@ export default function MessageItem({ message, showCollaborator = false }: Messa
   // 協作者資訊
   const hasCollaborator = showCollaborator && message.collaboratorNickname;
   const collaboratorColor = message.collaboratorColor || '#6B7280';
+
+  // 判斷是否應該顯示「記錄」按鈕
+  const shouldShowRetryButton =
+    !isUser &&
+    onRetryRecording &&
+    message.coachType &&
+    ['empathy', 'define', 'ideate', 'prototype'].includes(message.coachType);
+
+  const handleRetryRecording = () => {
+    if (onRetryRecording && !isRetrying) {
+      onRetryRecording(message.content);
+    }
+  };
 
   return (
     <div
@@ -96,15 +117,32 @@ export default function MessageItem({ message, showCollaborator = false }: Messa
           </div>
         )}
         <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
-        <div
-          className={`text-xs mt-1 ${
-            isUser ? 'text-blue-200' : 'text-gray-400'
-          }`}
-        >
-          {new Date(message.timestamp).toLocaleTimeString('zh-TW', {
-            hour: '2-digit',
-            minute: '2-digit',
-          })}
+        <div className="flex items-center justify-between mt-1 gap-2">
+          <div
+            className={`text-xs ${
+              isUser ? 'text-blue-200' : 'text-gray-400'
+            }`}
+          >
+            {new Date(message.timestamp).toLocaleTimeString('zh-TW', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </div>
+          {shouldShowRetryButton && (
+            <button
+              onClick={handleRetryRecording}
+              disabled={isRetrying}
+              className={`text-xs px-2 py-1 rounded-md flex items-center gap-1 transition-colors ${
+                isRetrying
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-50 text-blue-600 hover:bg-blue-100 active:bg-blue-200'
+              }`}
+              title="將此訊息的內容記錄到專案中"
+            >
+              <Save className="w-3 h-3" />
+              <span>{isRetrying ? '記錄中...' : '記錄'}</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

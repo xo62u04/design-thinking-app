@@ -198,6 +198,119 @@ export function useDesignThinkingChat(initialProjectName: string = 'Design Think
     abortControllerRef.current?.abort();
   }, []);
 
+  // 補救記錄：當 AI 忘記輸出 JSON action 時，手動觸發記錄
+  const retryRecording = useCallback(
+    async (messageContent: string) => {
+      if (isLoading || !projectState) return;
+
+      setError(null);
+      setIsLoading(true);
+
+      try {
+        // 根據當前階段和教練，生成補救提示
+        const stage = projectState.currentStage;
+        const coach = projectState.activeCoach;
+
+        let retryPrompt = '';
+
+        if (coach === 'empathy') {
+          retryPrompt = `請仔細閱讀以下內容，並將其中提到的觀察記錄下來。只輸出 JSON action，不需要對話內容。
+
+內容：${messageContent}
+
+請輸出對應的 JSON action 來記錄這個觀察。`;
+        } else if (coach === 'define') {
+          retryPrompt = `請仔細閱讀以下內容，並將其中提到的 POV 陳述記錄下來。只輸出 JSON action，不需要對話內容。
+
+內容：${messageContent}
+
+請輸出對應的 JSON action 來記錄這個 POV。`;
+        } else if (coach === 'ideate') {
+          retryPrompt = `請仔細閱讀以下內容，並將其中提到的點子記錄下來。只輸出 JSON action，不需要對話內容。
+
+內容：${messageContent}
+
+請輸出對應的 JSON action 來記錄這個點子。`;
+        } else if (coach === 'prototype') {
+          retryPrompt = `請仔細閱讀以下內容，並將其中提到的原型記錄下來。只輸出 JSON action，不需要對話內容。
+
+內容：${messageContent}
+
+請輸出對應的 JSON action 來記錄這個原型。`;
+        } else {
+          // 其他教練不支持補救記錄
+          setIsLoading(false);
+          return;
+        }
+
+        abortControllerRef.current = new AbortController();
+
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messages: [
+              ...projectState.chatHistory.map((msg) => ({
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content,
+              })),
+              { role: 'user' as const, content: retryPrompt },
+            ],
+            projectState,
+          }),
+          signal: abortControllerRef.current.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error('No response body');
+        }
+
+        const decoder = new TextDecoder();
+        let assistantContent = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          assistantContent += chunk;
+        }
+
+        // 處理補救回應（只處理 actions，不添加到聊天記錄）
+        const actions = parseActionsFromResponse(assistantContent);
+
+        if (actions.length > 0) {
+          setProjectState((prev) => {
+            if (!prev) return prev;
+
+            let newState = { ...prev };
+
+            // 應用 actions
+            newState = applyActions(newState, actions);
+
+            return newState;
+          });
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+      } finally {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
+    },
+    [projectState, isLoading]
+  );
+
   // 切換教練
   const switchCoach = useCallback((coach: CoachType) => {
     setProjectState((prev) => {
@@ -331,6 +444,7 @@ export function useDesignThinkingChat(initialProjectName: string = 'Design Think
     isLoading,
     error,
     stopGeneration,
+    retryRecording,
 
     // 教練與階段控制
     switchCoach,
