@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 }
 
 function buildSystemPrompt(basePrompt: string, projectState: ProjectState): string {
-  const { currentStage, observations, povStatements, ideas, prototypes } = projectState;
+  const { currentStage, observations, povStatements, surveys, ideas, prototypes } = projectState;
 
   // 根據不同階段，提供不同的上下文資訊
   let contextInfo = `
@@ -64,6 +64,19 @@ ${observations.map((obs, i) => `${i + 1}. [${obs.category}] ${obs.content}`).joi
     contextInfo += `
 ## 已定義的 POV 陳述 (${povStatements.length} 筆)
 ${povStatements.map((pov, i) => `${i + 1}. ${pov.statement}`).join('\n')}
+`;
+  }
+
+  // 定義階段：顯示問卷調查
+  if (surveys.length > 0) {
+    contextInfo += `
+## 已建立的問卷調查 (${surveys.length} 份)
+${surveys.map((survey, i) => {
+  const responsesInfo = survey.responses.length > 0
+    ? `（已收集 ${survey.responses.length} 份回答）`
+    : '（尚無回答）';
+  return `${i + 1}. [${survey.type}] ${survey.question} ${responsesInfo}`;
+}).join('\n')}
 `;
   }
 

@@ -37,6 +37,29 @@ export interface POVStatement {
   collaboratorColor?: string;
 }
 
+// 問卷調查
+export interface Survey {
+  id: string;
+  question: string;
+  type: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
+  options?: string[];           // 多選選項 (當 type 為 multiple_choice 時使用)
+  responses: SurveyResponse[];  // 回答記錄
+  createdAt: string;
+  // 協作者資訊
+  collaboratorId?: string;
+  collaboratorNickname?: string;
+  collaboratorColor?: string;
+}
+
+// 問卷回答
+export interface SurveyResponse {
+  id: string;
+  surveyId: string;
+  respondentName: string;       // 受訪者姓名
+  response: string | number;    // 答案 (文字、選項或評分)
+  createdAt: string;
+}
+
 // 點子項目
 export interface Idea {
   id: string;
@@ -148,6 +171,7 @@ export interface CollaborationSession {
 export type CoachType =
   | 'empathy'     // 同理心教練
   | 'define'      // 定義教練
+  | 'survey'      // 調查教練
   | 'ideate'      // 發想教練
   | 'prototype'   // 原型教練
   | 'test'        // 測試教練
@@ -183,6 +207,7 @@ export interface ProjectState {
   // 各階段產出
   observations: UserObservation[];      // 使用者觀察
   povStatements: POVStatement[];        // POV 陳述
+  surveys: Survey[];                    // 問卷調查
   ideas: Idea[];                        // 點子清單
   prototypes: Prototype[];              // 原型描述
 
@@ -345,6 +370,7 @@ export const createInitialProjectState = (name: string, description: string = ''
   currentStage: 'empathize',
   observations: [],
   povStatements: [],
+  surveys: [],
   ideas: [],
   prototypes: [],
   stageProgress: [

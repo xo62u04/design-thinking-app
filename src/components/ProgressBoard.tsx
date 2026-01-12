@@ -6,6 +6,7 @@ import {
   StageProgress,
   UserObservation,
   POVStatement,
+  Survey,
   Idea,
   Prototype,
 } from '@/types/design-thinking';
@@ -30,8 +31,10 @@ import {
   Zap,
   HelpCircle,
   Pen,
+  ClipboardList,
 } from 'lucide-react';
 import { useState } from 'react';
+import SurveyCard from './SurveyCard';
 
 const stageIcons = {
   empathize: Heart,
@@ -91,6 +94,7 @@ export default function ProgressBoard({
     stages: true,
     observations: true,
     povs: true,
+    surveys: true,
     ideas: true,
     prototypes: true,
     stats: true,
@@ -349,6 +353,49 @@ export default function ProgressBoard({
                 <div className="space-y-2 sm:space-y-3">
                   {projectState.povStatements.map((pov) => (
                     <POVCard key={pov.id} pov={pov} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Surveys Section */}
+        <div className="border-b">
+          <button
+            onClick={() => toggleSection('surveys')}
+            className="w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between hover:bg-gray-50"
+          >
+            <div className="flex items-center gap-2">
+              <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
+              <span className="text-xs sm:text-sm font-medium text-gray-700">
+                問卷調查
+              </span>
+              <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-indigo-100 text-indigo-600 rounded-full">
+                {projectState.surveys.length}
+              </span>
+            </div>
+            {expandedSections.surveys ? (
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
+
+          {expandedSections.surveys && (
+            <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+              {projectState.surveys.length === 0 ? (
+                <div className="text-center py-3 sm:py-4">
+                  <ClipboardList className="w-6 h-6 sm:w-8 sm:h-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-xs sm:text-sm text-gray-400">尚無問卷調查</p>
+                  <p className="text-xs text-gray-300 mt-1">
+                    與調查教練設計問卷
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 sm:space-y-3">
+                  {projectState.surveys.map((survey) => (
+                    <SurveyCard key={survey.id} survey={survey} />
                   ))}
                 </div>
               )}

@@ -2,6 +2,8 @@ import {
   ProjectState,
   UserObservation,
   POVStatement,
+  Survey,
+  SurveyResponse,
   Idea,
   Prototype,
   DesignThinkingStage,
@@ -12,6 +14,8 @@ import { STAGE_TO_COACH } from '@/constants/prompts';
 export type ActionType =
   | 'ADD_OBSERVATION'
   | 'ADD_POV'
+  | 'ADD_SURVEY'
+  | 'ADD_SURVEY_RESPONSE'
   | 'ADD_IDEA'
   | 'ADD_PROTOTYPE'
   | 'ADD_FEEDBACK'
@@ -145,6 +149,60 @@ export function applyAction(state: ProjectState, action: Action): ProjectState {
         povStatements: [...state.povStatements, newPOV],
         updatedAt: now,
         stageProgress: updateStageProgress(state.stageProgress, 'define', 'in_progress'),
+      };
+    }
+
+    case 'ADD_SURVEY': {
+      const data = action.data as {
+        question: string;
+        type: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
+        options?: string[];
+      };
+
+      if (!data?.question || !data?.type) return state;
+
+      const newSurvey: Survey = {
+        id: crypto.randomUUID(),
+        question: data.question,
+        type: data.type,
+        options: data.options,
+        responses: [],
+        createdAt: now,
+      };
+
+      return {
+        ...state,
+        surveys: [...state.surveys, newSurvey],
+        updatedAt: now,
+        stageProgress: updateStageProgress(state.stageProgress, 'define', 'in_progress'),
+      };
+    }
+
+    case 'ADD_SURVEY_RESPONSE': {
+      const data = action.data as {
+        surveyId: string;
+        respondentName: string;
+        response: string | number;
+      };
+
+      if (!data?.surveyId || !data?.respondentName || data?.response === undefined) return state;
+
+      const newResponse: SurveyResponse = {
+        id: crypto.randomUUID(),
+        surveyId: data.surveyId,
+        respondentName: data.respondentName,
+        response: data.response,
+        createdAt: now,
+      };
+
+      return {
+        ...state,
+        surveys: state.surveys.map(survey =>
+          survey.id === data.surveyId
+            ? { ...survey, responses: [...survey.responses, newResponse] }
+            : survey
+        ),
+        updatedAt: now,
       };
     }
 
