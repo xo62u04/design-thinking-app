@@ -20,7 +20,7 @@ import {
   Home,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { createWhiteboard, updatePrototypeWhiteboardId } from '@/lib/supabase/queries';
+import { createWhiteboard, updatePrototypeWhiteboardId, createSurvey } from '@/lib/supabase/queries';
 
 interface CollaborativeWorkspaceProps {
   projectId: string;
@@ -117,6 +117,19 @@ export default function CollaborativeWorkspace({
     } catch (error) {
       console.error('Failed to open whiteboard:', error);
       alert('開啟白板失敗，請稍後再試');
+    }
+  };
+
+  // 開啟問卷
+  const handleOpenSurvey = async (surveyId: string) => {
+    if (!projectState) return;
+
+    try {
+      // 直接開啟問卷頁面
+      window.open(`/survey/${surveyId}`, '_blank');
+    } catch (error) {
+      console.error('Failed to open survey:', error);
+      alert('開啟問卷失敗，請稍後再試');
     }
   };
 
@@ -273,6 +286,7 @@ export default function CollaborativeWorkspace({
               canAdvance={canAdvance}
               onAdvance={advanceToNextStage}
               onOpenWhiteboard={handleOpenWhiteboard}
+              onOpenSurvey={handleOpenSurvey}
             />
           </div>
         </div>
@@ -297,6 +311,7 @@ export default function CollaborativeWorkspace({
               canAdvance={canAdvance}
               onAdvance={advanceToNextStage}
               onOpenWhiteboard={handleOpenWhiteboard}
+              onOpenSurvey={handleOpenSurvey}
             />
           )}
         </div>

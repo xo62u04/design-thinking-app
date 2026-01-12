@@ -80,6 +80,7 @@ interface ProgressBoardProps {
   canAdvance?: boolean;
   onAdvance?: () => void;
   onOpenWhiteboard?: (prototypeId: string) => void;
+  onOpenSurvey?: (surveyId: string) => void;
 }
 
 export default function ProgressBoard({
@@ -89,6 +90,7 @@ export default function ProgressBoard({
   canAdvance,
   onAdvance,
   onOpenWhiteboard,
+  onOpenSurvey,
 }: ProgressBoardProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     stages: true,
@@ -395,7 +397,11 @@ export default function ProgressBoard({
               ) : (
                 <div className="space-y-2 sm:space-y-3">
                   {projectState.surveys.map((survey) => (
-                    <SurveyCard key={survey.id} survey={survey} />
+                    <SurveyCard
+                      key={survey.id}
+                      survey={survey}
+                      onOpenSurvey={onOpenSurvey}
+                    />
                   ))}
                 </div>
               )}

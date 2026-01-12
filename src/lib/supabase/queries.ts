@@ -683,3 +683,135 @@ export async function deleteWhiteboard(whiteboardId: string) {
 
   if (error) throw error;
 }
+
+// ============ Surveys ============
+
+export async function createSurvey(
+  projectId: string,
+  collaboratorId: string | null,
+  data: {
+    question: string;
+    type: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
+    options?: string[];
+  }
+) {
+  const supabase = getSupabase();
+
+  const { data: survey, error } = await supabase
+    .from('surveys')
+    .insert({
+      project_id: projectId,
+      question: data.question,
+      type: data.type,
+      options: data.options || [],
+      created_by: collaboratorId,
+    } as any)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return survey as any;
+}
+
+export async function getSurvey(surveyId: string) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('surveys')
+    .select('*')
+    .eq('id', surveyId)
+    .single();
+
+  if (error) throw error;
+  return data as any;
+}
+
+export async function getProjectSurveys(projectId: string) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('surveys')
+    .select('*')
+    .eq('project_id', projectId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data as any[];
+}
+
+export async function updateSurvey(
+  surveyId: string,
+  data: {
+    question?: string;
+    type?: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
+    options?: string[];
+  }
+) {
+  const supabase = getSupabase();
+
+  const updateData: any = {};
+  if (data.question !== undefined) updateData.question = data.question;
+  if (data.type !== undefined) updateData.type = data.type;
+  if (data.options !== undefined) updateData.options = data.options;
+
+  const { data: survey, error } = await supabase
+    .from('surveys')
+    .update(updateData)
+    .eq('id', surveyId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return survey as any;
+}
+
+export async function deleteSurvey(surveyId: string) {
+  const supabase = getSupabase();
+
+  const { error } = await supabase
+    .from('surveys')
+    .delete()
+    .eq('id', surveyId);
+
+  if (error) throw error;
+}
+
+// ============ Survey Responses ============
+
+export async function addSurveyResponse(
+  surveyId: string,
+  collaboratorId: string | null,
+  data: {
+    respondentName: string;
+    response: string;
+  }
+) {
+  const supabase = getSupabase();
+
+  const { data: surveyResponse, error } = await supabase
+    .from('survey_responses')
+    .insert({
+      survey_id: surveyId,
+      respondent_name: data.respondentName,
+      response: data.response,
+      created_by: collaboratorId,
+    } as any)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return surveyResponse as any;
+}
+
+export async function getSurveyResponses(surveyId: string) {
+  const supabase = getSupabase();
+
+  const { data, error } = await supabase
+    .from('survey_responses')
+    .select('*')
+    .eq('survey_id', surveyId)
+    .order('created_at', { ascending: true });
+
+  if (error) throw error;
+  return data as any[];
+}

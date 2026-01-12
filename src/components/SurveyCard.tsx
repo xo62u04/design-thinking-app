@@ -1,10 +1,11 @@
 'use client';
 
 import { Survey } from '@/types/design-thinking';
-import { ClipboardList, Star, MessageSquare, CheckSquare, BarChart3 } from 'lucide-react';
+import { ClipboardList, Star, MessageSquare, CheckSquare, BarChart3, ExternalLink } from 'lucide-react';
 
 interface SurveyCardProps {
   survey: Survey;
+  onOpenSurvey?: (surveyId: string) => void;
 }
 
 const surveyTypeIcons = {
@@ -21,7 +22,7 @@ const surveyTypeNames = {
   open_ended: '開放題',
 };
 
-export default function SurveyCard({ survey }: SurveyCardProps) {
+export default function SurveyCard({ survey, onOpenSurvey }: SurveyCardProps) {
   const TypeIcon = surveyTypeIcons[survey.type];
 
   return (
@@ -154,6 +155,17 @@ export default function SurveyCard({ survey }: SurveyCardProps) {
               </>
             )}
           </div>
+
+          {/* 開啟問卷按鈕 */}
+          {onOpenSurvey && (
+            <button
+              onClick={() => onOpenSurvey(survey.id)}
+              className="w-full mt-2 flex items-center justify-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-md transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              開啟協作問卷
+            </button>
+          )}
         </div>
       </div>
     </div>
