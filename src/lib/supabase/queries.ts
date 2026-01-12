@@ -479,6 +479,7 @@ export async function loadFullProjectState(projectId: string): Promise<ProjectSt
       collaborators,
       observations,
       povStatements,
+      surveys,
       ideas,
       prototypes,
       chatMessages,
@@ -488,11 +489,20 @@ export async function loadFullProjectState(projectId: string): Promise<ProjectSt
       getCollaborators(projectId),
       getObservations(projectId),
       getPOVStatements(projectId),
+      getProjectSurveys(projectId),
       getIdeas(projectId),
       getPrototypes(projectId),
       getChatMessages(projectId),
       getStageProgress(projectId),
     ]);
+
+    // 為每個問卷獲取回答
+    const surveysWithResponses = await Promise.all(
+      surveys.map(async (survey: any) => {
+        const responses = await getSurveyResponses(survey.id);
+        return { ...survey, responses };
+      })
+    );
 
     // 轉換為 ProjectState 格式
     return {
@@ -534,6 +544,21 @@ export async function loadFullProjectState(projectId: string): Promise<ProjectSt
         collaboratorId: p.collaborator_id || undefined,
         collaboratorNickname: p.collaborator?.nickname,
         collaboratorColor: p.collaborator?.color,
+      })),
+      surveys: surveysWithResponses.map((s: any) => ({
+        id: s.id,
+        question: s.question,
+        type: s.type,
+        options: s.options || [],
+        responses: (s.responses || []).map((r: any) => ({
+          id: r.id,
+          surveyId: r.survey_id,
+          respondentName: r.respondent_name,
+          response: r.response,
+          createdAt: r.created_at,
+        })),
+        createdAt: s.created_at,
+        collaboratorId: s.created_by || undefined,
       })),
       ideas: ideas.map((i: any) => ({
         id: i.id,
@@ -754,8 +779,8 @@ export async function updateSurvey(
   if (data.type !== undefined) updateData.type = data.type;
   if (data.options !== undefined) updateData.options = data.options;
 
-  const { data: survey, error } = await supabase
-    .from('surveys')
+  const { data: survey, error } = await (supabase
+    .from('surveys') as any)
     .update(updateData)
     .eq('id', surveyId)
     .select()

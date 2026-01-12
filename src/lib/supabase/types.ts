@@ -13,7 +13,7 @@ export type Json =
 
 // Enum types (defined first for use in Database interface)
 export type DesignStage = 'empathize' | 'define' | 'ideate' | 'prototype' | 'test';
-export type CoachType = 'orchestrator' | 'empathy' | 'define' | 'ideate' | 'prototype' | 'test';
+export type CoachType = 'orchestrator' | 'empathy' | 'define' | 'survey' | 'ideate' | 'prototype' | 'test';
 export type ObservationCategory = 'pain_point' | 'behavior' | 'need' | 'insight';
 export type IdeaStatus = 'raw' | 'refined' | 'selected' | 'discarded';
 export type PrototypeType = 'low_fidelity' | 'medium_fidelity' | 'high_fidelity';
