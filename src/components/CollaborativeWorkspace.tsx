@@ -133,6 +133,24 @@ export default function CollaborativeWorkspace({
     }
   };
 
+  // 創建問卷
+  const handleCreateSurvey = async (surveyData: {
+    question: string;
+    type: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
+    options?: string[];
+  }) => {
+    if (!projectState) return;
+
+    try {
+      const survey = await createSurvey(projectId, collaboratorId, surveyData);
+      // 創建成功後自動開啟問卷
+      window.open(`/survey/${survey.id}`, '_blank');
+    } catch (error) {
+      console.error('Failed to create survey:', error);
+      alert('創建問卷失敗，請稍後再試');
+    }
+  };
+
   // Loading state
   if (!isInitialized || !projectState) {
     return (
@@ -287,6 +305,7 @@ export default function CollaborativeWorkspace({
               onAdvance={advanceToNextStage}
               onOpenWhiteboard={handleOpenWhiteboard}
               onOpenSurvey={handleOpenSurvey}
+              onCreateSurvey={handleCreateSurvey}
             />
           </div>
         </div>
@@ -312,6 +331,7 @@ export default function CollaborativeWorkspace({
               onAdvance={advanceToNextStage}
               onOpenWhiteboard={handleOpenWhiteboard}
               onOpenSurvey={handleOpenSurvey}
+              onCreateSurvey={handleCreateSurvey}
             />
           )}
         </div>

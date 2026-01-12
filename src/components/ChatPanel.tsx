@@ -15,12 +15,14 @@ import {
   ChevronLeft,
   ChevronRight,
   HelpCircle,
+  ClipboardList,
 } from 'lucide-react';
 
 const iconMap = {
   Brain,
   Heart,
   Target,
+  ClipboardList,
   Lightbulb,
   Box,
   FlaskConical,
@@ -87,6 +89,7 @@ export default function ChatPanel({
     'orchestrator',
     'empathy',
     'define',
+    'survey',
     'ideate',
     'prototype',
     'test',

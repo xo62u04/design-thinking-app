@@ -32,9 +32,11 @@ import {
   HelpCircle,
   Pen,
   ClipboardList,
+  Plus,
 } from 'lucide-react';
 import { useState } from 'react';
 import SurveyCard from './SurveyCard';
+import CreateSurveyModal from './CreateSurveyModal';
 
 const stageIcons = {
   empathize: Heart,
@@ -81,6 +83,11 @@ interface ProgressBoardProps {
   onAdvance?: () => void;
   onOpenWhiteboard?: (prototypeId: string) => void;
   onOpenSurvey?: (surveyId: string) => void;
+  onCreateSurvey?: (surveyData: {
+    question: string;
+    type: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
+    options?: string[];
+  }) => void;
 }
 
 export default function ProgressBoard({
@@ -91,6 +98,7 @@ export default function ProgressBoard({
   onAdvance,
   onOpenWhiteboard,
   onOpenSurvey,
+  onCreateSurvey,
 }: ProgressBoardProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     stages: true,
@@ -101,6 +109,7 @@ export default function ProgressBoard({
     prototypes: true,
     stats: true,
   });
+  const [isCreateSurveyModalOpen, setIsCreateSurveyModalOpen] = useState(false);
 
   const stages: DesignThinkingStage[] = [
     'empathize',
@@ -364,11 +373,11 @@ export default function ProgressBoard({
 
         {/* Surveys Section */}
         <div className="border-b">
-          <button
-            onClick={() => toggleSection('surveys')}
-            className="w-full px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between hover:bg-gray-50"
-          >
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3">
+            <button
+              onClick={() => toggleSection('surveys')}
+              className="flex items-center gap-2 hover:bg-gray-50 rounded px-2 py-1 -ml-2"
+            >
               <ClipboardList className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-500" />
               <span className="text-xs sm:text-sm font-medium text-gray-700">
                 問卷調查
@@ -376,13 +385,24 @@ export default function ProgressBoard({
               <span className="px-1.5 sm:px-2 py-0.5 text-xs bg-indigo-100 text-indigo-600 rounded-full">
                 {projectState.surveys.length}
               </span>
-            </div>
-            {expandedSections.surveys ? (
-              <ChevronDown className="w-4 h-4 text-gray-400" />
-            ) : (
-              <ChevronRight className="w-4 h-4 text-gray-400" />
+              {expandedSections.surveys ? (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+
+            {/* 建立問卷按鈕 */}
+            {onCreateSurvey && (
+              <button
+                onClick={() => setIsCreateSurveyModalOpen(true)}
+                className="flex items-center gap-1 px-2 sm:px-3 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+              >
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">建立問卷</span>
+              </button>
             )}
-          </button>
+          </div>
 
           {expandedSections.surveys && (
             <div className="px-3 sm:px-4 pb-3 sm:pb-4">
@@ -545,6 +565,15 @@ export default function ProgressBoard({
           )}
         </div>
       </div>
+
+      {/* 建立問卷模態框 */}
+      {onCreateSurvey && (
+        <CreateSurveyModal
+          isOpen={isCreateSurveyModalOpen}
+          onClose={() => setIsCreateSurveyModalOpen(false)}
+          onCreateSurvey={onCreateSurvey}
+        />
+      )}
     </div>
   );
 }
