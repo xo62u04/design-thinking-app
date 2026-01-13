@@ -33,6 +33,7 @@ import {
   Pen,
   ClipboardList,
   Plus,
+  EyeOff,
 } from 'lucide-react';
 import { useState } from 'react';
 import SurveyCard from './SurveyCard';
@@ -83,6 +84,11 @@ interface ProgressBoardProps {
   onAdvance?: () => void;
   onOpenWhiteboard?: (prototypeId: string) => void;
   onOpenSurvey?: (surveyId: string) => void;
+  onToggleRecordActive?: (
+    type: 'observation' | 'pov' | 'survey' | 'idea' | 'prototype',
+    id: string,
+    isActive: boolean
+  ) => void;
   onCreateSurvey?: (surveyData: {
     question: string;
     type: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
@@ -99,6 +105,7 @@ export default function ProgressBoard({
   onOpenWhiteboard,
   onOpenSurvey,
   onCreateSurvey,
+  onToggleRecordActive,
 }: ProgressBoardProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     stages: true,
@@ -312,9 +319,22 @@ export default function ProgressBoard({
                             {items.map((obs) => (
                               <div
                                 key={obs.id}
-                                className={`p-2 rounded-lg border text-xs sm:text-sm break-words ${categoryColors[obs.category]}`}
+                                className={`p-2 rounded-lg border text-xs sm:text-sm break-words ${categoryColors[obs.category]} ${obs.isActive === false ? 'opacity-50 bg-gray-100' : ''} flex items-start justify-between gap-2`}
                               >
-                                {obs.content}
+                                <span className="flex-1">{obs.content}</span>
+                                {onToggleRecordActive && (
+                                  <button
+                                    onClick={() => onToggleRecordActive('observation', obs.id, obs.isActive === false)}
+                                    className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors"
+                                    title={obs.isActive === false ? '啟用此紀錄' : '停用此紀錄'}
+                                  >
+                                    {obs.isActive === false ? (
+                                      <Eye className="h-3.5 w-3.5" />
+                                    ) : (
+                                      <EyeOff className="h-3.5 w-3.5" />
+                                    )}
+                                  </button>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -363,7 +383,11 @@ export default function ProgressBoard({
               ) : (
                 <div className="space-y-2 sm:space-y-3">
                   {projectState.povStatements.map((pov) => (
-                    <POVCard key={pov.id} pov={pov} />
+                    <POVCard
+                      key={pov.id}
+                      pov={pov}
+                      onToggle={(id, isActive) => onToggleRecordActive?.('pov', id, isActive)}
+                    />
                   ))}
                 </div>
               )}
@@ -464,7 +488,11 @@ export default function ProgressBoard({
               ) : (
                 <div className="space-y-2 sm:space-y-3">
                   {projectState.ideas.map((idea) => (
-                    <IdeaCard key={idea.id} idea={idea} />
+                    <IdeaCard
+                      key={idea.id}
+                      idea={idea}
+                      onToggle={(id, isActive) => onToggleRecordActive?.('idea', id, isActive)}
+                    />
                   ))}
                 </div>
               )}
@@ -511,6 +539,7 @@ export default function ProgressBoard({
                       key={prototype.id}
                       prototype={prototype}
                       onOpenWhiteboard={onOpenWhiteboard}
+                      onToggle={(id, isActive) => onToggleRecordActive?.('prototype', id, isActive)}
                     />
                   ))}
                 </div>
@@ -579,12 +608,21 @@ export default function ProgressBoard({
 }
 
 // POV 卡片組件
-function POVCard({ pov }: { pov: POVStatement }) {
+function POVCard({ pov, onToggle }: { pov: POVStatement; onToggle?: (id: string, isActive: boolean) => void }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldTruncate = pov.statement.length > 80;
 
   return (
-    <div className="p-2 sm:p-3 bg-blue-50 rounded-lg border border-blue-200">
+    <div className={`p-2 sm:p-3 bg-blue-50 rounded-lg border border-blue-200 ${pov.isActive === false ? 'opacity-50 bg-gray-100' : ''} relative`}>
+      {onToggle && (
+        <button
+          onClick={() => onToggle(pov.id, pov.isActive === false)}
+          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+          title={pov.isActive === false ? '啟用此紀錄' : '停用此紀錄'}
+        >
+          {pov.isActive === false ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+        </button>
+      )}
       <div className="mb-2">
         <p className={`text-xs sm:text-sm text-blue-800 font-medium break-words ${!isExpanded && shouldTruncate ? 'line-clamp-2' : ''}`}>
           {pov.statement}
@@ -617,7 +655,7 @@ function POVCard({ pov }: { pov: POVStatement }) {
 }
 
 // 點子卡片組件
-function IdeaCard({ idea }: { idea: Idea }) {
+function IdeaCard({ idea, onToggle }: { idea: Idea; onToggle?: (id: string, isActive: boolean) => void }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldTruncate = idea.description.length > 80;
 
@@ -636,7 +674,16 @@ function IdeaCard({ idea }: { idea: Idea }) {
   };
 
   return (
-    <div className="p-2 sm:p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+    <div className={`p-2 sm:p-3 bg-yellow-50 rounded-lg border border-yellow-200 ${idea.isActive === false ? 'opacity-50 bg-gray-100' : ''} relative`}>
+      {onToggle && (
+        <button
+          onClick={() => onToggle(idea.id, idea.isActive === false)}
+          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+          title={idea.isActive === false ? '啟用此紀錄' : '停用此紀錄'}
+        >
+          {idea.isActive === false ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+        </button>
+      )}
       <div className="flex items-start justify-between gap-2 mb-2">
         <h4 className="text-xs sm:text-sm text-yellow-800 font-medium break-words flex-1">
           {idea.title}
@@ -675,9 +722,11 @@ function IdeaCard({ idea }: { idea: Idea }) {
 function PrototypeCard({
   prototype,
   onOpenWhiteboard,
+  onToggle,
 }: {
   prototype: Prototype;
   onOpenWhiteboard?: (prototypeId: string) => void;
+  onToggle?: (id: string, isActive: boolean) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const shouldTruncate = prototype.description.length > 80;
@@ -695,7 +744,16 @@ function PrototypeCard({
   };
 
   return (
-    <div className="p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200">
+    <div className={`p-2 sm:p-3 bg-green-50 rounded-lg border border-green-200 ${prototype.isActive === false ? 'opacity-50 bg-gray-100' : ''} relative`}>
+      {onToggle && (
+        <button
+          onClick={() => onToggle(prototype.id, prototype.isActive === false)}
+          className="absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors"
+          title={prototype.isActive === false ? '啟用此紀錄' : '停用此紀錄'}
+        >
+          {prototype.isActive === false ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+        </button>
+      )}
       <div className="flex items-start justify-between gap-2 mb-2">
         <h4 className="text-xs sm:text-sm text-green-800 font-medium break-words flex-1">
           {prototype.name}

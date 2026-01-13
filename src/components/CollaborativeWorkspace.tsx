@@ -53,6 +53,7 @@ export default function CollaborativeWorkspace({
     switchStage,
     advanceToNextStage,
     updateProjectName,
+    handleToggleRecordActive,
     stageCompletion,
     canAdvance,
     currentCollaborator,
@@ -306,6 +307,7 @@ export default function CollaborativeWorkspace({
               onOpenWhiteboard={handleOpenWhiteboard}
               onOpenSurvey={handleOpenSurvey}
               onCreateSurvey={handleCreateSurvey}
+              onToggleRecordActive={handleToggleRecordActive}
             />
           </div>
         </div>
@@ -332,6 +334,7 @@ export default function CollaborativeWorkspace({
               onOpenWhiteboard={handleOpenWhiteboard}
               onOpenSurvey={handleOpenSurvey}
               onCreateSurvey={handleCreateSurvey}
+              onToggleRecordActive={handleToggleRecordActive}
             />
           )}
         </div>

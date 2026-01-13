@@ -20,6 +20,7 @@ export type PrototypeType = 'low_fidelity' | 'medium_fidelity' | 'high_fidelity'
 export type FeedbackType = 'positive' | 'negative' | 'suggestion';
 export type MessageRole = 'user' | 'assistant' | 'system';
 export type StageStatus = 'not_started' | 'in_progress' | 'completed';
+export type SurveyType = 'text' | 'multiple_choice' | 'rating' | 'open_ended';
 
 export interface Database {
   public: {
@@ -89,6 +90,7 @@ export interface Database {
           content: string;
           category: ObservationCategory;
           source: string | null;
+          is_active: boolean;
           created_at: string;
         };
         Insert: {
@@ -98,9 +100,12 @@ export interface Database {
           content: string;
           category: ObservationCategory;
           source?: string | null;
+          is_active?: boolean;
           created_at?: string;
         };
-        Update: never; // Append-only
+        Update: {
+          is_active?: boolean;
+        };
       };
       pov_statements: {
         Row: {
@@ -111,6 +116,7 @@ export interface Database {
           need: string;
           insight: string;
           statement: string;
+          is_active: boolean;
           created_at: string;
         };
         Insert: {
@@ -121,9 +127,66 @@ export interface Database {
           need: string;
           insight: string;
           statement: string;
+          is_active?: boolean;
           created_at?: string;
         };
-        Update: never; // Append-only
+        Update: {
+          is_active?: boolean;
+        };
+      };
+      surveys: {
+        Row: {
+          id: string;
+          project_id: string;
+          question: string;
+          type: SurveyType;
+          options: Json;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          question: string;
+          type: SurveyType;
+          options?: Json;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+        };
+        Update: {
+          question?: string;
+          type?: SurveyType;
+          options?: Json;
+          is_active?: boolean;
+          updated_at?: string;
+        };
+      };
+      survey_responses: {
+        Row: {
+          id: string;
+          survey_id: string;
+          respondent_name: string;
+          response: string;
+          is_active: boolean;
+          created_at: string;
+          created_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          survey_id: string;
+          respondent_name: string;
+          response: string;
+          is_active?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+        };
+        Update: {
+          is_active?: boolean;
+        };
       };
       ideas: {
         Row: {
@@ -135,6 +198,7 @@ export interface Database {
           votes: number;
           status: IdeaStatus;
           tags: string[];
+          is_active: boolean;
           created_at: string;
         };
         Insert: {
@@ -146,11 +210,13 @@ export interface Database {
           votes?: number;
           status?: IdeaStatus;
           tags?: string[];
+          is_active?: boolean;
           created_at?: string;
         };
         Update: {
           votes?: number;
           status?: IdeaStatus;
+          is_active?: boolean;
         };
       };
       prototypes: {
@@ -163,6 +229,7 @@ export interface Database {
           type: PrototypeType;
           features: string[];
           whiteboard_id: string | null;
+          is_active: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -175,6 +242,7 @@ export interface Database {
           type?: PrototypeType;
           features?: string[];
           whiteboard_id?: string | null;
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -184,6 +252,7 @@ export interface Database {
           type?: PrototypeType;
           features?: string[];
           whiteboard_id?: string | null;
+          is_active?: boolean;
           updated_at?: string;
         };
       };
@@ -297,6 +366,7 @@ export interface Database {
       feedback_type: FeedbackType;
       message_role: MessageRole;
       stage_status: StageStatus;
+      survey_type: SurveyType;
     };
   };
 }

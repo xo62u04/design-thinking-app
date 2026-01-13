@@ -193,6 +193,7 @@ export async function getObservations(projectId: string) {
       collaborator:collaborators(nickname, color)
     `)
     .eq('project_id', projectId)
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
@@ -238,6 +239,7 @@ export async function getPOVStatements(projectId: string) {
       collaborator:collaborators(nickname, color)
     `)
     .eq('project_id', projectId)
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
@@ -282,6 +284,7 @@ export async function getIdeas(projectId: string) {
       collaborator:collaborators(nickname, color)
     `)
     .eq('project_id', projectId)
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
@@ -349,6 +352,7 @@ export async function getPrototypes(projectId: string) {
       )
     `)
     .eq('project_id', projectId)
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
@@ -835,8 +839,68 @@ export async function getSurveyResponses(surveyId: string) {
     .from('survey_responses')
     .select('*')
     .eq('survey_id', surveyId)
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
   if (error) throw error;
   return data as any[];
+}
+
+// ==================== 軟刪除 / 停用功能 ====================
+
+/**
+ * 切換紀錄的啟用狀態 (軟刪除)
+ */
+export async function toggleRecordActive(
+  table: 'observations' | 'pov_statements' | 'surveys' | 'survey_responses' | 'ideas' | 'prototypes',
+  recordId: string,
+  isActive: boolean
+): Promise<void> {
+  const supabase = getSupabase();
+
+  const { error } = await (supabase.from(table) as any).update({ is_active: isActive }).eq('id', recordId);
+
+  if (error) throw error;
+}
+
+/**
+ * 停用觀察紀錄
+ */
+export async function toggleObservationActive(id: string, isActive: boolean) {
+  return toggleRecordActive('observations', id, isActive);
+}
+
+/**
+ * 停用 POV 陳述
+ */
+export async function togglePOVActive(id: string, isActive: boolean) {
+  return toggleRecordActive('pov_statements', id, isActive);
+}
+
+/**
+ * 停用問卷
+ */
+export async function toggleSurveyActive(id: string, isActive: boolean) {
+  return toggleRecordActive('surveys', id, isActive);
+}
+
+/**
+ * 停用問卷回答
+ */
+export async function toggleSurveyResponseActive(id: string, isActive: boolean) {
+  return toggleRecordActive('survey_responses', id, isActive);
+}
+
+/**
+ * 停用點子
+ */
+export async function toggleIdeaActive(id: string, isActive: boolean) {
+  return toggleRecordActive('ideas', id, isActive);
+}
+
+/**
+ * 停用原型
+ */
+export async function togglePrototypeActive(id: string, isActive: boolean) {
+  return toggleRecordActive('prototypes', id, isActive);
 }

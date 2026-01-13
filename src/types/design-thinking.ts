@@ -15,6 +15,7 @@ export interface UserObservation {
   id: string;
   content: string;
   category: 'pain_point' | 'behavior' | 'need' | 'insight';
+  isActive?: boolean; // 是否啟用（軟刪除標記）
   createdAt: string;
   source?: string; // 觀察來源（訪談、觀察等）
   // 協作者資訊
@@ -30,6 +31,7 @@ export interface POVStatement {
   need: string;        // 需求描述
   insight: string;     // 洞察描述
   statement: string;   // 完整 POV 陳述
+  isActive?: boolean; // 是否啟用（軟刪除標記）
   createdAt: string;
   // 協作者資訊
   collaboratorId?: string;
@@ -42,6 +44,7 @@ export interface Survey {
   id: string;
   question: string;
   type: 'text' | 'multiple_choice' | 'rating' | 'open_ended';
+  isActive?: boolean; // 是否啟用（軟刪除標記）
   options?: string[];           // 多選選項 (當 type 為 multiple_choice 時使用)
   responses: SurveyResponse[];  // 回答記錄
   createdAt: string;
@@ -57,6 +60,7 @@ export interface SurveyResponse {
   surveyId: string;
   respondentName: string;       // 受訪者姓名
   response: string | number;    // 答案 (文字、選項或評分)
+  isActive?: boolean; // 是否啟用（軟刪除標記）
   createdAt: string;
 }
 
@@ -67,6 +71,7 @@ export interface Idea {
   description: string;
   votes: number;
   status: 'raw' | 'refined' | 'selected' | 'discarded';
+  isActive?: boolean; // 是否啟用（軟刪除標記）
   createdAt: string;
   tags?: string[];
   // 協作者資訊
@@ -81,6 +86,7 @@ export interface Prototype {
   name: string;
   description: string;
   type: 'low_fidelity' | 'medium_fidelity' | 'high_fidelity';
+  isActive?: boolean; // 是否啟用（軟刪除標記）
   features: string[];
   feedbacks: PrototypeFeedback[];
   whiteboardId?: string; // 關聯的白板 ID

@@ -28,6 +28,11 @@ import {
   addIdea,
   addPrototype,
   updateProject,
+  toggleObservationActive,
+  togglePOVActive,
+  toggleSurveyActive,
+  toggleIdeaActive,
+  togglePrototypeActive,
   getCollaborators,
 } from '@/lib/supabase/queries';
 import {
@@ -715,6 +720,85 @@ export function useCollaboration({
     : { empathize: 0, define: 0, ideate: 0, prototype: 0, test: 0 };
 
   // 檢查是否可以進入下一階段
+
+  // 停用/啟用紀錄
+  const handleToggleRecordActive = useCallback(
+    async (
+      type: 'observation' | 'pov' | 'survey' | 'idea' | 'prototype',
+      id: string,
+      isActive: boolean
+    ) => {
+      try {
+        // 調用對應的 toggle 函數
+        switch (type) {
+          case 'observation':
+            await toggleObservationActive(id, isActive);
+            break;
+          case 'pov':
+            await togglePOVActive(id, isActive);
+            break;
+          case 'survey':
+            await toggleSurveyActive(id, isActive);
+            break;
+          case 'idea':
+            await toggleIdeaActive(id, isActive);
+            break;
+          case 'prototype':
+            await togglePrototypeActive(id, isActive);
+            break;
+        }
+
+        // 更新本地狀態
+        setProjectState((prev) => {
+          if (!prev) return prev;
+
+          switch (type) {
+            case 'observation':
+              return {
+                ...prev,
+                observations: prev.observations.map((obs) =>
+                  obs.id === id ? { ...obs, isActive } : obs
+                ),
+              };
+            case 'pov':
+              return {
+                ...prev,
+                povStatements: prev.povStatements.map((pov) =>
+                  pov.id === id ? { ...pov, isActive } : pov
+                ),
+              };
+            case 'survey':
+              return {
+                ...prev,
+                surveys: prev.surveys.map((survey) =>
+                  survey.id === id ? { ...survey, isActive } : survey
+                ),
+              };
+            case 'idea':
+              return {
+                ...prev,
+                ideas: prev.ideas.map((idea) =>
+                  idea.id === id ? { ...idea, isActive } : idea
+                ),
+              };
+            case 'prototype':
+              return {
+                ...prev,
+                prototypes: prev.prototypes.map((proto) =>
+                  proto.id === id ? { ...proto, isActive } : proto
+                ),
+              };
+            default:
+              return prev;
+          }
+        });
+      } catch (err) {
+        console.error('Failed to toggle record active state:', err);
+      }
+    },
+    []
+  );
+
   const canAdvance = projectState ? shouldAdvanceStage(projectState) : false;
 
   return {
@@ -729,6 +813,7 @@ export function useCollaboration({
     switchStage,
     advanceToNextStage,
     updateProjectName,
+    handleToggleRecordActive,
     stageCompletion,
     canAdvance,
     currentCollaborator: {
